@@ -20,9 +20,9 @@ async function bootstrap() {
     }),
   );
 
-  // CORS
+  // CORS - allow frontend to connect
   app.enableCors({
-    origin: configService.get<string>('cors.origin'),
+    origin: '*', // For production, replace with specific frontend URL
     credentials: true,
   });
 
@@ -40,18 +40,21 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('api/docs', app, document);
 
-  const port = configService.get<number>('port') || 3001;
-  await app.listen(port);
+  // If we are not running on Vercel, listen on the port
+  if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
+    const port = configService.get<number>('port') || 3001;
+    await app.listen(port);
+    console.log(`Server running on: http://localhost:${port}`);
+  }
 
-  console.log(`
-╔═══════════════════════════════════════════════════════╗
-║                                                       ║
-║   🏛️  LOTIQUE AUCTION PLATFORM                        ║
-║                                                       ║
-║   Server running on: http://localhost:${port}            ║
-║   API Docs:          http://localhost:${port}/api/docs   ║
-║                                                       ║
-╚═══════════════════════════════════════════════════════╝
-  `);
+  return app.getHttpAdapter().getInstance();
 }
-bootstrap();
+
+// For Vercel
+let server: any;
+export default async (req: any, res: any) => {
+  if (!server) {
+    server = await bootstrap();
+  }
+  return server(req, res);
+};
