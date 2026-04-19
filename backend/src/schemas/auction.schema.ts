@@ -113,7 +113,7 @@ export class Auction {
   startingBid: number;
 
   @Prop({ min: 0 })
-  reservePrice?: number; // Hidden from bidders
+  reservePrice?: number;// Hidden from bidders that must be met for sale to occur 
 
   @Prop({ min: 0 })
   buyNowPrice?: number;
