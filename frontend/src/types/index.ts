@@ -84,6 +84,7 @@ export interface Auction {
   visibility: AuctionVisibility;
   shipping?: ShippingInfo;
   lotNumber?: string;
+  depositRequired?: number;
   featured: boolean;
   reserveMet: boolean;
   buyNowUsed: boolean;
